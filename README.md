@@ -1,80 +1,49 @@
 # WorkdayDebrief
 
-WorkdayDebrief is a Tauri desktop app that collects daily work activity and generates end-of-day summaries using a local LLM (Ollama).
+[![Rust](https://img.shields.io/badge/Rust-dea584?style=flat-square&logo=rust)](#) [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](#)
 
-## What it does
+> End every workday with a clear narrative — generated locally from what you actually did.
 
-- Aggregates activity from Jira, Google Calendar, and Toggl
-- Generates narrative summaries with a local model through Ollama
-- Lets you review, edit, export, and deliver summaries (email/Slack/file)
-- Stores summary history locally in SQLite
+WorkdayDebrief aggregates your daily activity from Jira, Google Calendar, and Toggl, then uses a local Ollama model to generate a coherent end-of-day summary. Review and edit the narrative, then deliver it via email, Slack, or file export. Everything stays local in SQLite — no cloud, no subscriptions.
 
-## Stack
+## Features
 
-- Frontend: React 19, TypeScript, Vite, Tailwind CSS
-- Desktop/runtime: Tauri 2, Rust
-- Data + services: SQLite (`sqlx`), OAuth2 (Google), reqwest, lettre
+- **Activity aggregation** — pulls from Jira tickets, Google Calendar events, and Toggl time entries
+- **Local LLM narrative** — Ollama generates human-readable summaries from raw activity data
+- **Review and edit** — full text editing before delivery, with tone and length controls
+- **Flexible delivery** — send via email (lettre), post to Slack, or export to file
+- **Summary history** — SQLite stores all past summaries for review and pattern analysis
 
-## Prerequisites
+## Quick Start
 
-- macOS
-- Node.js and npm
-- Rust toolchain
-- Ollama running locally
+### Prerequisites
+- macOS, Node.js, npm
+- Rust toolchain (`rustup`)
+- [Ollama](https://ollama.com/) running locally
 
-## Quick start
-
+### Installation
 ```bash
 npm ci
-npm run tauri dev
 ```
 
-## Dev modes
-
-### Normal dev (fastest rebuilds, more local disk usage)
-
+### Usage
 ```bash
 npm run tauri dev
 ```
 
-This keeps Rust and Vite build caches in the repo (`src-tauri/target`, `node_modules/.vite`) for faster restart and incremental compile times.
+## Tech Stack
 
-### Lean dev (lower disk usage, slower cold starts)
+| Layer | Technology |
+|-------|------------|
+| Language | Rust + TypeScript |
+| Desktop runtime | Tauri 2 |
+| Frontend | React 19, Vite, Tailwind CSS |
+| AI inference | Ollama (local) |
+| Storage | SQLite (sqlx) |
+| Auth | OAuth2 (Google) |
+| Email | lettre |
+| HTTP | reqwest |
 
-```bash
-npm run dev:lean
-```
+## License
 
-`dev:lean` runs the same Tauri dev flow, but redirects heavy build caches to a temporary directory and removes heavy generated artifacts when the app exits.
-
-## Build
-
-```bash
-npm run build
-npm run tauri build
-```
-
-## Useful scripts
-
-From `package.json`:
-
-- `npm run dev`: start Vite frontend
-- `npm run dev:lean`: run Tauri dev with temporary cache locations and auto-clean heavy artifacts on exit
-- `npm run build`: type-check and build frontend assets
-- `npm run preview`: preview built frontend
-- `npm run tauri`: run Tauri CLI
-- `npm run clean:heavy`: remove heavy build artifacts only (`dist`, `src-tauri/target`, `src-tauri/gen`, Vite caches, and TS build info)
-- `npm run clean:full`: remove all reproducible local caches (includes `node_modules` plus heavy artifacts)
-- `npm run clean`: alias for `npm run clean:full`
-
-## Project layout
-
-- `src/`: React UI
-- `src-tauri/src/`: Rust backend commands and services
-- `src-tauri/migrations/`: SQLite migrations
-- `src-tauri/icons/`: app icons used for bundles
-
-## Notes
-
-- Secrets and tokens should be handled through the app settings, not hardcoded in files.
-- LLM generation depends on a locally available Ollama model.
+MIT
