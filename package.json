@@ -47,7 +47,7 @@
     "typescript": "~5.8.3",
     "vite": "^6.0.11",
     "@commitlint/cli": "^19.8.1",
-    "@commitlint/config-conventional": "^19.8.1",
+    "@commitlint/config-conventional": "^21.0.1",
     "@commitlint/cz-commitlint": "^19.8.1",
     "@lhci/cli": "^0.15.1",
     "commitizen": "^4.3.1",
