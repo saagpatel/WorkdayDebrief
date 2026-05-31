@@ -1,14 +1,20 @@
 use crate::error::AppError;
 use oauth2::{
-    basic::BasicClient, reqwest::async_http_client, AuthUrl, AuthorizationCode, ClientId,
-    ClientSecret, CsrfToken, PkceCodeChallenge, RedirectUrl, Scope, TokenResponse, TokenUrl,
+    basic::BasicClient, AuthUrl, AuthorizationCode, ClientId, ClientSecret, CsrfToken,
+    EndpointNotSet, EndpointSet, PkceCodeChallenge, RedirectUrl, Scope, TokenResponse, TokenUrl,
 };
 use std::net::TcpListener;
 use tauri::Emitter;
 
+/// BasicClient with the auth + token endpoints configured (oauth2 5.x typestate:
+/// <HasAuthUrl, HasDeviceAuthUrl, HasIntrospectionUrl, HasRevocationUrl, HasTokenUrl>).
+type ConfiguredClient =
+    BasicClient<EndpointSet, EndpointNotSet, EndpointNotSet, EndpointNotSet, EndpointSet>;
+
 /// Google OAuth2 client configuration
 pub struct GoogleOAuthClient {
-    client: BasicClient,
+    client: ConfiguredClient,
+    http_client: oauth2::reqwest::Client,
 }
 
 impl GoogleOAuthClient {
@@ -25,15 +31,24 @@ impl GoogleOAuthClient {
         let redirect_url = RedirectUrl::new(redirect_uri.to_string())
             .map_err(|e| AppError::NotConfigured(format!("Invalid redirect URL: {}", e)))?;
 
-        let client = BasicClient::new(
-            ClientId::new(client_id),
-            Some(ClientSecret::new(client_secret)),
-            auth_url,
-            Some(token_url),
-        )
-        .set_redirect_uri(redirect_url);
+        let client = BasicClient::new(ClientId::new(client_id))
+            .set_client_secret(ClientSecret::new(client_secret))
+            .set_auth_uri(auth_url)
+            .set_token_uri(token_url)
+            .set_redirect_uri(redirect_url);
 
-        Ok(Self { client })
+        // oauth2 5.x removed the built-in async_http_client; supply an explicit reqwest
+        // client that does NOT follow redirects (following redirects on the token
+        // endpoint is a security risk the crate now refuses to do for you).
+        let http_client = oauth2::reqwest::ClientBuilder::new()
+            .redirect(oauth2::reqwest::redirect::Policy::none())
+            .build()
+            .map_err(|e| AppError::NotConfigured(format!("HTTP client build failed: {}", e)))?;
+
+        Ok(Self {
+            client,
+            http_client,
+        })
     }
 
     /// Generate authorization URL and PKCE verifier
@@ -71,7 +86,7 @@ impl GoogleOAuthClient {
             .client
             .exchange_code(AuthorizationCode::new(code))
             .set_pkce_verifier(pkce_verifier)
-            .request_async(async_http_client)
+            .request_async(&self.http_client)
             .await
             .map_err(|e| AppError::NotConfigured(format!("Token exchange failed: {}", e)))?;
 
@@ -92,7 +107,7 @@ impl GoogleOAuthClient {
         let token_result = self
             .client
             .exchange_refresh_token(&refresh_token)
-            .request_async(async_http_client)
+            .request_async(&self.http_client)
             .await
             .map_err(|e| AppError::NotConfigured(format!("Token refresh failed: {}", e)))?;
 
