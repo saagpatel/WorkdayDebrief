@@ -48,7 +48,7 @@
     "vite": "^8.0.16",
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^21.0.2",
-    "@commitlint/cz-commitlint": "^19.8.1",
+    "@commitlint/cz-commitlint": "^21.0.2",
     "@lhci/cli": "^0.15.1",
     "commitizen": "^4.3.1",
     "husky": "^9.1.7",
