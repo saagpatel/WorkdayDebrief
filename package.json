@@ -35,25 +35,25 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^2.11.0",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.11.2",
-    "@types/react": "^19.0.6",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.0.2",
     "@vitejs/plugin-react": "^6.0.2",
-    "tailwindcss": "^4.3.0",
+    "tailwindcss": "^4.3.1",
     "typescript": "~6.0.3",
     "vite": "^8.0.16",
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^21.0.2",
     "@commitlint/cz-commitlint": "^19.8.1",
     "@lhci/cli": "^0.15.1",
-    "commitizen": "^4.3.1",
+    "commitizen": "^4.3.2",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",
-    "prettier": "^3.8.3"
+    "prettier": "^3.8.4"
   },
   "config": {
     "commitizen": {
